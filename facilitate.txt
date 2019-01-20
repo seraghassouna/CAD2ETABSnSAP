@@ -1,0 +1,94 @@
+Sub text()
+'get running AutoCAD object
+Dim mycad As AcadApplication, mydoc As AcadDocument, filepath As String
+Set mycad = GetObject(, "AutoCAD.Application.20")
+'get the selected drawing, provided from python code
+With Sheet1
+    filepath = .Range(.Cells(1, 1), .Cells(1, 1)).Value
+End With
+
+Dim iCount As Integer, i As Integer, j As Integer, CompName As String
+iCount = mycad.Documents.Count
+For i = 0 To iCount - 1
+    CompName = mycad.Documents.Item(i).FullName
+    If CompName Like filepath Then
+        j = i
+        Exit For
+    End If
+Next i
+Set mydoc = mycad.Documents.Item(j)
+mydoc.AuditInfo True
+Dim name2 As String, handler As String
+
+'get the object from its provided handle
+With Sheet1
+    handler = .Range(.Cells(2, 1), .Cells(2, 1)).Value
+End With
+Dim myXRecord As AcadXRecord
+Set myXRecord = mydoc.HandleToObject(handler)
+
+'MsgBox "XRecord name: " & myXRecord.Name 'debug line
+
+Dim DxfGrCd As Variant, Val As Variant
+DxfGrCd = Array()
+Val = Array()
+myXRecord.GetXRecordData DxfGrCd, Val
+
+Dim UB As Integer
+UB = UBound(DxfGrCd)
+For i = 0 To UB
+    With Sheet1
+        .Range(.Cells((i + 1), 2), .Cells((i + 1), 2)).Value = DxfGrCd(i)
+        .Range(.Cells((i + 1), 3), .Cells((i + 1), 3)).Value = Val(i)
+    End With
+Next i
+
+End Sub
+
+
+Sub getfromid()
+'get running AutoCAD object
+Dim mycad As AcadApplication, mydoc As AcadDocument, filepath As String
+Set mycad = GetObject(, "AutoCAD.Application.20")
+'get the selected drawing, provided from python code
+With Sheet1
+    filepath = .Range(.Cells(1, 1), .Cells(1, 1)).Value
+End With
+
+Dim iCount As Integer, i As Integer, j As Integer, CompName As String
+iCount = mycad.Documents.Count
+For i = 0 To iCount - 1
+    CompName = mycad.Documents.Item(i).FullName
+    If CompName Like filepath Then
+        j = i
+        Exit For
+    End If
+Next i
+Set mydoc = mycad.Documents.Item(j)
+mydoc.AuditInfo True
+Dim name2 As String, objid As LongPtr
+
+'get the object from its provided handle
+With Sheet1
+    objid = .Range(.Cells(2, 1), .Cells(2, 1)).Value
+End With
+Dim myXRecord As AcadXRecord
+Set myXRecord = mydoc.ObjectIdToObject(objid)
+
+'MsgBox "XRecord name: " & myXRecord.Name 'debug line
+
+Dim DxfGrCd As Variant, Val As Variant
+DxfGrCd = Array()
+Val = Array()
+myXRecord.GetXRecordData DxfGrCd, Val
+
+Dim UB As Integer
+UB = UBound(DxfGrCd)
+For i = 0 To UB
+    With Sheet1
+        .Range(.Cells((i + 1), 2), .Cells((i + 1), 2)).Value = DxfGrCd(i)
+        .Range(.Cells((i + 1), 3), .Cells((i + 1), 3)).Value = Val(i)
+    End With
+Next i
+
+End Sub
